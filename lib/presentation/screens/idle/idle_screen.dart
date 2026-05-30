@@ -255,7 +255,66 @@ class _IdleScreenState extends State<IdleScreen> {
       ),
     );
   }
+  // Helper to build road service tile
+  Widget _buildRoadServiceTile({
+    required IconData icon,
+    required String label,
+    required String phone,
+  }) {
+    return ListTile(
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, color: AppColors.textSecondary, size: 20),
+      ),
+      title: Text(
+        label,
+        style: const TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      subtitle: Text(
+        phone.isEmpty ? 'Not available' : phone,
+        style: const TextStyle(
+          color: AppColors.textSecondary,
+          fontSize: 13,
+        ),
+      ),
+      trailing: phone.isEmpty
+          ? null
+          : GestureDetector(
+              onTap: () async {
+                final uri = Uri(scheme: 'tel', path: phone);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.confirmedGreen,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'Call',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+    );
+  }
 }
+
 
 class SosButton extends StatefulWidget {
   const SosButton({super.key});

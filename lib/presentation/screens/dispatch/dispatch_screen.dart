@@ -385,7 +385,7 @@ class DispatchScreen extends StatelessWidget {
             width: 48.0,
             height: 48.0,
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.15),
+              color: iconColor.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(
