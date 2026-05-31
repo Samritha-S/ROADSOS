@@ -69,8 +69,8 @@ class SeedData {
       FacilityModel(
         id: uuid.v4(),
         name: 'Government Hospital Salem',
-        latitude: 11.6643,
-        longitude: 78.1460,
+        latitude: 11.6584,
+        longitude: 78.1456,
         phone: '0427-2411520',
         serviceType: ServiceType.HOSPITAL,
         emergencyTier: EmergencyTier.CRITICAL,
@@ -84,8 +84,8 @@ class SeedData {
       FacilityModel(
         id: uuid.v4(),
         name: 'Vinayaka Mission Hospital Salem',
-        latitude: 11.6760,
-        longitude: 78.1324,
+        latitude: 11.6892,
+        longitude: 78.1398,
         phone: '0427-3911111',
         serviceType: ServiceType.HOSPITAL,
         emergencyTier: EmergencyTier.CRITICAL,
@@ -253,7 +253,7 @@ class SeedData {
       FacilityModel(
         id: uuid.v4(),
         name: 'Salem District Police Control Room',
-        latitude: 11.6643,
+        latitude: 11.6639,
         longitude: 78.1460,
         phone: '0427-2411100',
         serviceType: ServiceType.POLICE,

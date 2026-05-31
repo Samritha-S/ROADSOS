@@ -1,9 +1,9 @@
 // lib/main.dart
 // ROADSoS - Main Entry Point
 
+import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'app/app.dart';
 import 'data/local/database_helper.dart';
 import 'data/remote/bundle_service.dart';
@@ -20,9 +20,17 @@ import 'presentation/controllers/settings_controller.dart';
 import 'presentation/controllers/timeline_controller.dart';
 import 'presentation/controllers/triage_controller.dart';
 
+Future<void> requestPermissions() async {
+  await Permission.location.request();
+  await Permission.locationAlways.request();
+  await Permission.phone.request();
+  await Permission.sms.request();
+}
 void main() async {
   // 1. WidgetsFlutterBinding.ensureInitialized()
   WidgetsFlutterBinding.ensureInitialized();
+
+  await requestPermissions();
 
   // 2. Initialize DatabaseHelper (triggers seed data)
   final dbHelper = DatabaseHelper.instance;
@@ -47,11 +55,11 @@ void main() async {
   ));
   await incidentController.initializeApp();
 
-  Get.lazyPut<TriageController>(() => TriageController());
-  Get.lazyPut<ServiceController>(() => ServiceController());
-  Get.lazyPut<TimelineController>(() => TimelineController());
-  Get.lazyPut<SettingsController>(() => SettingsController());
-  Get.lazyPut<BystanderController>(() => BystanderController());
+  Get.put(TriageController());
+  Get.put(ServiceController());
+  Get.put(TimelineController());
+  Get.put(SettingsController());
+  Get.put(BystanderController());
 
   // 4. runApp(RoadSoSApp())
   runApp(const RoadSoSApp());

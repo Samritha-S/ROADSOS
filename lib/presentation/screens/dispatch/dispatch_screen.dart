@@ -507,12 +507,15 @@ class DispatchScreen extends StatelessWidget {
                         itemBuilder: (context, idx) {
                           final facility = facilities[idx];
                           final incident = incidentController.currentIncident.value;
+                          debugPrint('Incident coords: ${incident?.latitude}, ${incident?.longitude}');
+                          debugPrint('Facility: ${facility.name} at ${facility.latitude}, ${facility.longitude}');
                           final double distance = ServiceRankingAlgorithm.calculateDistanceKm(
                             incident?.latitude ?? 11.6643,
                             incident?.longitude ?? 78.1460,
                             facility.latitude,
                             facility.longitude,
                           );
+                          debugPrint('Distance: $distance km');
                           return _buildServiceCard(context, facility, distance);
                         },
                       );

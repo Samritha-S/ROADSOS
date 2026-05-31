@@ -5,16 +5,12 @@ class DistanceUtils {
   DistanceUtils._();
 
   static String formatDistance(double distanceKm) {
-    if (distanceKm < 1.0) {
-      final meters = distanceKm * 1000;
-      var roundedMeters = (meters / 100).round() * 100;
-      if (roundedMeters < 100 && distanceKm > 0) {
-        roundedMeters = 100;
-      }
-      if (roundedMeters >= 1000) {
-        return '1.0km';
-      }
-      return '${roundedMeters}m';
+    if (distanceKm < 0.1) {
+      return 'Less than 100m';
+    } else if (distanceKm < 1.0) {
+      final meters = (distanceKm * 1000).round();
+      final rounded = (meters / 100).round() * 100;
+      return '${rounded}m';
     } else if (distanceKm < 10.0) {
       return '${distanceKm.toStringAsFixed(1)}km';
     } else {
@@ -23,11 +19,10 @@ class DistanceUtils {
   }
 
   static String formatEta(double distanceKm) {
-    // Assumes average emergency vehicle speed: 60 km/h (which is 1 km/min)
-    var etaMinutes = distanceKm.round();
-    if (etaMinutes < 1) {
-      etaMinutes = 1;
+    if (distanceKm < 0.1) {
+      return 'Est. 1 min away';
     }
-    return 'Est. $etaMinutes min away';
+    final minutes = (distanceKm / 60 * 60).ceil(); // Assuming 60km/h = 1km/min
+    return 'Est. ${minutes < 1 ? 1 : minutes} min away';
   }
 }
