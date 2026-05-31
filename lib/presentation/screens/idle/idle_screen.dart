@@ -45,63 +45,9 @@ class _IdleScreenState extends State<IdleScreen> {
     }
   }
 
-  Widget _buildServiceTile({
-    required String icon,
-    required String serviceName,
-    required String facilityName,
-    required String? phone,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
-      child: Row(
-        children: [
-          Text(icon, style: const TextStyle(fontSize: 28.0)),
-          const SizedBox(width: 16.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(serviceName, style: AppTextStyles.bodyLarge),
-                const SizedBox(height: 4.0),
-                Text(
-                  facilityName,
-                  style: AppTextStyles.bodyMedium,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          if (phone != null && phone.isNotEmpty)
-            SizedBox(
-              height: 80.0,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryRed,
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                ),
-                onPressed: () => _makeCall(phone),
-                child: Text(AppStrings.callingLabel, style: AppTextStyles.buttonLabel),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
 
-  Future<void> _makeCall(String phoneNumber) async {
-    final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
-    try {
-      if (await canLaunchUrl(launchUri)) {
-        await launchUrl(launchUri);
-      }
-    } catch (_) {}
-  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -163,6 +109,29 @@ class _IdleScreenState extends State<IdleScreen> {
                 ),
               ),
             ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => Get.toNamed(Routes.bystanderEntry),
+                icon: const Icon(Icons.people, color: AppColors.confirmedGreen),
+                label: const Text(
+                  "I'm helping someone nearby",
+                  style: TextStyle(
+                    color: AppColors.confirmedGreen,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.confirmedGreen, width: 1.5),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
             // Bottom - services card
             Container(
               margin: const EdgeInsets.fromLTRB(16, 0, 16, 32),
@@ -205,51 +174,7 @@ class _IdleScreenState extends State<IdleScreen> {
                 ],
               ),
             ),
-            Expanded(
-              flex: 3,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      AppStrings.roadServicesTitle,
-                      style: AppTextStyles.subheadline.copyWith(color: AppColors.textPrimary),
-                    ),
-                    const SizedBox(height: 24.0),
-                    Obx(() {
-                      final towing = _serviceController.towingFacilities.firstOrNull;
-                      final puncture = _serviceController.punctureFacilities.firstOrNull;
-                      final showroom = _serviceController.showroomFacilities.firstOrNull;
-                      return Column(
-                        children: [
-                          _buildServiceTile(
-                            icon: '🚗',
-                            serviceName: AppStrings.towingLabel,
-                            facilityName: towing?.name ?? AppStrings.noFacilitiesMessage,
-                            phone: towing?.phone,
-                          ),
-                          const SizedBox(height: 16.0),
-                          _buildServiceTile(
-                            icon: '🔧',
-                            serviceName: AppStrings.punctureShopLabel,
-                            facilityName: puncture?.name ?? AppStrings.noFacilitiesMessage,
-                            phone: puncture?.phone,
-                          ),
-                          const SizedBox(height: 16.0),
-                          _buildServiceTile(
-                            icon: '🏪',
-                            serviceName: AppStrings.showroomLabel,
-                            facilityName: showroom?.name ?? AppStrings.noFacilitiesMessage,
-                            phone: showroom?.phone,
-                          ),
-                        ],
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
+
           ],
         ),
       ),

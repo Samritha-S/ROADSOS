@@ -46,7 +46,6 @@ class _BystanderEntryScreenState extends State<BystanderEntryScreen> {
       ),
       body: SafeArea(
         child: Obx(() {
-          // Rule 6: Every screen uses Obx() to reactively observe state.
           final _ = _bystanderController.hasJoinedIncident.value;
           
           return SingleChildScrollView(
@@ -54,155 +53,136 @@ class _BystanderEntryScreenState extends State<BystanderEntryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Header
-                Padding(
-                  padding: const EdgeInsets.only(top: 40.0),
-                  child: Text(
-                    AppStrings.howCanWeHelp,
-                    style: AppTextStyles.headline,
-                    textAlign: TextAlign.center,
+                const SizedBox(height: 24.0),
+                // 1. Title & Subtitle
+                Text(
+                  'Join an Incident',
+                  style: AppTextStyles.headline.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 48.0),
+                const SizedBox(height: 12.0),
+                const Text(
+                  "Enter the 6-character code shown on the victim's phone",
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 40.0),
 
-                // Option 1 Button: Victim
-                SizedBox(
-                  height: 100.0, // Touch target > 80px
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryRed,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
+                // 2. Large text field for code entry
+                TextField(
+                  controller: _codeController,
+                  maxLength: 6,
+                  textAlign: TextAlign.center,
+                  textCapitalization: TextCapitalization.characters,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 32.0,
+                    letterSpacing: 8.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  decoration: const InputDecoration(
+                    counterText: '',
+                    hintText: 'CODE',
+                    hintStyle: TextStyle(
+                      color: AppColors.cardBorder,
+                      fontSize: 32.0,
+                      letterSpacing: 8.0,
                     ),
-                    onPressed: () => Get.offAllNamed(Routes.idle),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.personal_injury, color: AppColors.textPrimary, size: 28.0),
-                        const SizedBox(height: 4.0),
-                        Text(
-                          AppStrings.optionVictim,
-                          style: AppTextStyles.buttonLabel,
-                        ),
-                      ],
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.confirmedGreen, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.confirmedGreen, width: 2.5),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24.0),
 
-                // Option 2 Button: Helper
+                // 3. JOIN button (full width, green)
                 SizedBox(
-                  height: 100.0, // Touch target > 80px
+                  height: 64.0,
                   width: double.infinity,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: AppColors.surface,
-                      side: const BorderSide(
-                        color: AppColors.confirmedGreen,
-                        width: 2.0,
-                      ),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.confirmedGreen,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                     ),
-                    onPressed: () => Get.toNamed(Routes.bystanderTask),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.people, color: AppColors.confirmedGreen, size: 28.0),
-                        const SizedBox(height: 4.0),
-                        Text(
-                          AppStrings.optionHelper,
-                          style: AppTextStyles.buttonLabel.copyWith(
-                            color: AppColors.confirmedGreen,
-                          ),
-                        ),
-                      ],
+                    onPressed: () {
+                      final code = _codeController.text.trim();
+                      if (code.length == 6) {
+                        _bystanderController.joinWithCode(code);
+                        Get.toNamed(Routes.bystanderTask);
+                      } else {
+                        Get.snackbar(
+                          AppStrings.appName,
+                          AppStrings.invalidCodeMsg,
+                          backgroundColor: AppColors.surface,
+                          colorText: AppColors.textPrimary,
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                      }
+                    },
+                    child: Text(
+                      AppStrings.joinIncidentBtn,
+                      style: AppTextStyles.buttonLabel.copyWith(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 48.0),
+                const SizedBox(height: 40.0),
 
-                // Divider with text
+                // 4. Divider with 'or'
                 Row(
                   children: [
-                    const Expanded(child: Divider(color: AppColors.textSecondary, thickness: 1.0)),
+                    const Expanded(child: Divider(color: AppColors.cardBorder, thickness: 1.0)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
-                        AppStrings.orEnterCode,
-                        style: AppTextStyles.bodyLarge.copyWith(
+                        'or',
+                        style: TextStyle(
                           color: AppColors.textSecondary,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    const Expanded(child: Divider(color: AppColors.textSecondary, thickness: 1.0)),
+                    const Expanded(child: Divider(color: AppColors.cardBorder, thickness: 1.0)),
                   ],
                 ),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 40.0),
 
-                // Text Field
-                TextField(
-                  controller: _codeController,
-                  maxLength: 6,
-                  textCapitalization: TextCapitalization.characters,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 24.0,
-                    letterSpacing: 4.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: InputDecoration(
-                    counterText: '',
-                    hintText: AppStrings.enterCodeHint,
-                    hintStyle: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 20.0,
-                      letterSpacing: 1.0,
-                    ),
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.textSecondary, width: 1.0),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.confirmedGreen, width: 2.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-
-                // Join Button
+                // 5. 'I found an accident with no code'
                 SizedBox(
-                  height: 80.0, // Touch target height: 80px
+                  height: 64.0,
                   width: double.infinity,
-                  child: Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 64.0),
-                        backgroundColor: AppColors.confirmedGreen,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: AppColors.surface,
+                      side: const BorderSide(color: AppColors.cardBorder, width: 1.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
-                      onPressed: () {
-                        final code = _codeController.text.trim();
-                        if (code.length == 6) {
-                          _bystanderController.joinWithCode(code);
-                          Get.toNamed(Routes.bystanderTask);
-                        } else {
-                          Get.snackbar(
-                            AppStrings.appName,
-                            AppStrings.invalidCodeMsg,
-                            backgroundColor: AppColors.surface,
-                            colorText: AppColors.textPrimary,
-                            snackPosition: SnackPosition.BOTTOM,
-                          );
-                        }
-                      },
-                      child: Text(
-                        AppStrings.joinIncidentBtn,
-                        style: AppTextStyles.buttonLabel,
+                    ),
+                    onPressed: () => Get.offAllNamed(Routes.idle),
+                    icon: const Icon(Icons.warning_amber_rounded, color: AppColors.primaryRed),
+                    label: const Text(
+                      'I found an accident with no code',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

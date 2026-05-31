@@ -101,11 +101,11 @@ class ServiceController extends GetxController {
 
   List<FacilityModel> getFacilitiesForPriorityOrder() {
     final incidentController = Get.find<IncidentController>();
-    final priorityScore = incidentController.priorityScore;
+    final triageResult = incidentController.currentIncident.value?.triageResult;
     
-    if (priorityScore == null) return [];
+    if (triageResult == null) return [];
     
-    final priorityOrder = TriageEngine.getPriorityOrder(priorityScore);
+    final priorityOrder = TriageEngine.getPriorityOrder(triageResult);
     
     List<FacilityModel> topFacilities = [];
     
@@ -120,7 +120,10 @@ class ServiceController extends GetxController {
     return topFacilities;
   }
 
+  final Rx<FacilityModel?> lastFailedFacility = Rx<FacilityModel?>(null);
+
   void checkEscalation(FacilityModel failedFacility, ServiceType serviceType) {
+    lastFailedFacility.value = failedFacility;
     final incidentController = Get.find<IncidentController>();
     final currentIncident = incidentController.currentIncident.value;
     
@@ -128,9 +131,14 @@ class ServiceController extends GetxController {
     
     final rankedList = _getListForType(serviceType);
     
+    List<String> excludeIds = [
+      ...currentIncident.servicesContactedIds,
+      failedFacility.id,
+    ];
+    
     final nextFacility = EscalationManager.getNextFacility(
       rankedFacilities: rankedList,
-      alreadyContactedIds: currentIncident.servicesContactedIds,
+      alreadyContactedIds: excludeIds,
     );
     
     escalationSuggestion.value = nextFacility;

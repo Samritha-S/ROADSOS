@@ -1,6 +1,8 @@
 // lib/domain/escalation/escalation_manager.dart
 // ROADSoS - Escalation Manager
 
+import 'package:collection/collection.dart';
+
 import '../../core/models/facility_model.dart';
 import '../ranking/service_ranking_algorithm.dart';
 
@@ -32,12 +34,9 @@ class EscalationManager {
     required List<FacilityModel> rankedFacilities,
     required List<String> alreadyContactedIds,
   }) {
-    for (final facility in rankedFacilities) {
-      if (!alreadyContactedIds.contains(facility.id)) {
-        return facility;
-      }
-    }
-    return null;
+    return rankedFacilities.firstWhereOrNull(
+      (f) => !alreadyContactedIds.contains(f.id)
+    );
   }
 
   static String getEscalationMessage(

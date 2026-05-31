@@ -16,11 +16,15 @@ import '../../../core/utils/distance_utils.dart';
 import '../../../domain/ranking/service_ranking_algorithm.dart';
 import '../../../domain/triage/triage_engine.dart';
 import '../../../app/routes.dart';
+import '../../../core/models/timeline_entry_model.dart';
+import '../../../data/repository/incident_repository.dart';
 import '../../controllers/incident_controller.dart';
 import '../../controllers/service_controller.dart';
 
 class DispatchScreen extends StatelessWidget {
-  const DispatchScreen({super.key});
+  final ScrollController _scrollController = ScrollController();
+
+  DispatchScreen({super.key});
 
   // Map ServiceType to IconData and color
   IconData _iconData(ServiceType type) {
@@ -65,9 +69,8 @@ class DispatchScreen extends StatelessWidget {
     } catch (_) {}
   }
 
-  void _showCallStatusDialog(BuildContext context, FacilityModel facility) {
+  void _showCallStatusDialog(FacilityModel facility) {
     final incidentController = Get.find<IncidentController>();
-    final serviceController = Get.find<ServiceController>();
 
     Get.dialog(
       AlertDialog(
@@ -82,9 +85,8 @@ class DispatchScreen extends StatelessWidget {
             height: 80.0, // Minimum touch target height: 80px
             child: TextButton(
               onPressed: () {
-                incidentController.recordServiceNoAnswer(facility.id, facility.name);
-                serviceController.checkEscalation(facility, facility.serviceType);
                 Get.back();
+                _showNoAnswerFollowUpDialog(facility);
               },
               child: Text(
                 AppStrings.answerNo,
@@ -115,6 +117,299 @@ class DispatchScreen extends StatelessWidget {
     );
   }
 
+  void _showNoAnswerFollowUpDialog(FacilityModel facility) {
+    final incidentController = Get.find<IncidentController>();
+    final serviceController = Get.find<ServiceController>();
+
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text(
+          'No answer — what would you like to do?',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Option 1: Try calling again (Red button)
+              SizedBox(
+                height: 50.0,
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.criticalRed,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () async {
+                    Get.back();
+                    await _makeCall(facility.phone);
+                    _showCallStatusDialog(facility);
+                  },
+                  child: const Text(
+                    'Try calling again',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.0),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12.0),
+              // Option 2: Try next service (Green button)
+              SizedBox(
+                height: 50.0,
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.confirmedGreen,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    Get.back();
+                    incidentController.recordServiceNoAnswer(facility.id, facility.name);
+                    serviceController.checkEscalation(facility, facility.serviceType);
+                    
+                    // Smoothly scroll to the bottom of the scroll view
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (_scrollController.hasClients) {
+                        _scrollController.animateTo(
+                          _scrollController.position.maxScrollExtent,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeOut,
+                        );
+                      }
+                    });
+                  },
+                  child: const Text(
+                    'Try next service',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.0),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12.0),
+              // Option 3: Call 112 directly (Outlined Surface button)
+              SizedBox(
+                height: 50.0,
+                width: double.infinity,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: AppColors.surface,
+                    side: const BorderSide(color: AppColors.cardBorder, width: 1.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () async {
+                    Get.back();
+                    final uri = Uri(scheme: 'tel', path: '112');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                    }
+                    incidentController.stateMachine.addTimelineEntry(
+                      TimelineEntryType.SERVICE_NO_ANSWER,
+                      'National emergency number called: 112',
+                    );
+                    if (incidentController.currentIncident.value != null) {
+                      await IncidentRepository.saveIncident(incidentController.currentIncident.value!);
+                    }
+                  },
+                  child: const Text(
+                    'Call 112 directly',
+                    style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15.0),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+            ],
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  void _showFamilyAlertDialog() {
+    final incidentController = Get.find<IncidentController>();
+
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text(
+          'Who needs help?',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Select who is injured to send the correct alert message.',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14.0),
+            ),
+          ],
+        ),
+        actions: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Option 1: I am injured (Red button)
+              SizedBox(
+                height: 50.0,
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.criticalRed,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    incidentController.sendFamilyAlert(isVictim: true);
+                    Get.back();
+                  },
+                  child: const Text(
+                    'I am injured',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.0),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12.0),
+              // Option 2: Someone else is injured (Amber button)
+              SizedBox(
+                height: 50.0,
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.warningAmber,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    Get.back();
+                    _showBystanderFamilyAlertDialog();
+                  },
+                  child: const Text(
+                    'Someone else is injured',
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15.0),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              // Cancel option
+              TextButton(
+                onPressed: () => Get.back(),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+  void _showBystanderFamilyAlertDialog() {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text(
+          "Alert the victim's family",
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Option 1: I have the victim's phone (Green button)
+              SizedBox(
+                height: 50.0,
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.confirmedGreen,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    Get.back();
+                    Get.snackbar(
+                      'Family Alert',
+                      "Open ROADSoS on the victim's phone and hold the SOS button to alert their family.",
+                      backgroundColor: AppColors.surface,
+                      colorText: AppColors.textPrimary,
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                  },
+                  child: const Text(
+                    "I have the victim's phone",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.0),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12.0),
+              // Option 2: I don't have their phone (Outlined Surface button)
+              SizedBox(
+                height: 50.0,
+                width: double.infinity,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: AppColors.surface,
+                    side: const BorderSide(color: AppColors.cardBorder, width: 1.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    Get.back();
+                    Get.snackbar(
+                      'Family Alert',
+                      'Focus on calling emergency services. Ambulance and police have been notified.',
+                      backgroundColor: AppColors.surface,
+                      colorText: AppColors.textPrimary,
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                  },
+                  child: const Text(
+                    "I don't have their phone",
+                    style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15.0),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              // Option 3: Cancel (Text button)
+              TextButton(
+                onPressed: () => Get.back(),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      barrierDismissible: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final incidentController = Get.find<IncidentController>();
@@ -126,8 +421,9 @@ class DispatchScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         backgroundColor: AppColors.background,
         title: Obx(() {
-          final priority = incidentController.priorityScore ?? PriorityScore.NON_EMERGENCY;
-          final titleText = TriageEngine.getPriorityMessage(priority);
+          final triageResult = incidentController.currentIncident.value?.triageResult;
+          final priority = triageResult?.priorityScore ?? PriorityScore.NON_EMERGENCY;
+          final titleText = TriageEngine.getPriorityMessage(triageResult);
           return Text(
             titleText,
             style: AppTextStyles.subheadline.copyWith(
@@ -138,45 +434,47 @@ class DispatchScreen extends StatelessWidget {
         }),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Priority Banner
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-              color: AppColors.criticalRed,
-              child: Obx(() {
-                final priority = incidentController.priorityScore ?? PriorityScore.NON_EMERGENCY;
-                final message = TriageEngine.getPriorityMessage(priority);
-                return Text(
-                  message,
-                  style: AppTextStyles.subheadline.copyWith(color: Colors.white),
-                  textAlign: TextAlign.center,
-                );
-              }),
-            ),
-            // Offline banner
-            Obx(() {
-              if (incidentController.isOffline.value) {
-                return Container(
-                  width: double.infinity,
-                  color: AppColors.warningAmber,
-                  padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-                  child: Center(
-                    child: Text(
-                      AppStrings.offlineBannerText,
-                      style: AppTextStyles.bodyLarge.copyWith(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Priority Banner
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                color: AppColors.criticalRed,
+                child: Obx(() {
+                  final triageResult = incidentController.currentIncident.value?.triageResult;
+                  final message = TriageEngine.getPriorityMessage(triageResult);
+                  return Text(
+                    message,
+                    style: AppTextStyles.subheadline.copyWith(color: Colors.white),
+                    textAlign: TextAlign.center,
+                  );
+                }),
+              ),
+              // Offline banner
+              Obx(() {
+                if (incidentController.isOffline.value) {
+                  return Container(
+                    width: double.infinity,
+                    color: AppColors.warningAmber,
+                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                    child: Center(
+                      child: Text(
+                        AppStrings.offlineBannerText,
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            }),
-            Expanded(
-              child: SingleChildScrollView(
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+              Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,47 +521,114 @@ class DispatchScreen extends StatelessWidget {
                     // Escalation Suggestion
                     Obx(() {
                       final nextFacility = serviceController.escalationSuggestion.value;
+                      final failedFacility = serviceController.lastFailedFacility.value;
+
+                      if (failedFacility != null && (nextFacility == null || nextFacility.id == failedFacility.id)) {
+                        return Container(
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBackground,
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(
+                              color: AppColors.cardBorder,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'No more options nearby. Call 112 directly.',
+                                style: TextStyle(
+                                  color: AppColors.criticalRed,
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 12.0),
+                              SizedBox(
+                                height: 48.0,
+                                width: double.infinity,
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryRed,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    final uri = Uri(scheme: 'tel', path: '112');
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(uri);
+                                    }
+                                  },
+                                  icon: const Icon(Icons.phone, size: 18),
+                                  label: const Text(
+                                    'Call 112',
+                                    style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
                       if (nextFacility == null) return const SizedBox.shrink();
+
                       return Container(
                         padding: const EdgeInsets.all(16.0),
                         decoration: BoxDecoration(
                           color: AppColors.cardBackground,
                           borderRadius: BorderRadius.circular(12.0),
                           border: Border.all(
-                            color: AppColors.warningAmber,
-                            width: 2.0,
+                            color: AppColors.cardBorder,
+                            width: 1.0,
                           ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              AppStrings.noAnswerPrompt,
-                              style: AppTextStyles.bodyLarge.copyWith(
-                                color: AppColors.warningAmber,
-                                fontWeight: FontWeight.bold,
+                            const Text(
+                              'No answer — next option available below',
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             const SizedBox(height: 8.0),
                             Text(
                               nextFacility.name,
-                              style: AppTextStyles.bodyLarge,
+                              style: AppTextStyles.bodyLarge.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
-                            const SizedBox(height: 16.0),
+                            const SizedBox(height: 12.0),
                             SizedBox(
-                              height: 80.0,
+                              height: 48.0,
                               width: double.infinity,
-                              child: ElevatedButton(
+                              child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryRed,
+                                  backgroundColor: AppColors.surface,
+                                  foregroundColor: AppColors.textPrimary,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    side: const BorderSide(color: AppColors.cardBorder),
+                                  ),
                                 ),
                                 onPressed: () {
                                   _makeCall(nextFacility.phone);
-                                  _showCallStatusDialog(context, nextFacility);
+                                  _showCallStatusDialog(nextFacility);
                                 },
-                                child: Text(
-                                  AppStrings.callingLabel,
-                                  style: AppTextStyles.buttonLabel,
+                                icon: const Icon(Icons.phone, size: 18),
+                                label: Text(
+                                  'Call ${nextFacility.name}',
+                                  style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w600),
                                 ),
                               ),
                             ),
@@ -272,7 +637,12 @@ class DispatchScreen extends StatelessWidget {
                       );
                     }),
                     Obx(() {
-                      if (serviceController.escalationSuggestion.value != null) {
+                      final nextFacility = serviceController.escalationSuggestion.value;
+                      final failedFacility = serviceController.lastFailedFacility.value;
+                      if (nextFacility != null && (failedFacility == null || nextFacility.id != failedFacility.id)) {
+                        return const SizedBox(height: 24.0);
+                      }
+                      if (failedFacility != null) {
                         return const SizedBox(height: 24.0);
                       }
                       return const SizedBox.shrink();
@@ -328,7 +698,9 @@ class DispatchScreen extends StatelessWidget {
                                     width: 1.0,
                                   ),
                                 ),
-                                onPressed: () => incidentController.sendFamilyAlert(),
+                                onPressed: () {
+                                  _showFamilyAlertDialog();
+                                },
                                 child: Text(
                                   AppStrings.sendEmergencyAlertBtn,
                                   style: AppTextStyles.buttonLabel.copyWith(
@@ -345,8 +717,8 @@ class DispatchScreen extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -462,7 +834,7 @@ class DispatchScreen extends StatelessWidget {
               ),
               onPressed: () {
                 _makeCall(facility.phone);
-                _showCallStatusDialog(context, facility);
+                _showCallStatusDialog(facility);
               },
               child: Text(
                 AppStrings.callingLabel,

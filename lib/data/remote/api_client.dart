@@ -4,7 +4,7 @@
 import 'package:dio/dio.dart';
 
 class ApiClient {
-  static const String baseUrl = 'https://roadsos-backend.up.railway.app/api/v1';
+  static const String baseUrl = 'https://roadsos-yz1o.onrender.com/api/v1';
   
   static final ApiClient instance = ApiClient._init();
   late final Dio _dio;

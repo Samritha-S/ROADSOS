@@ -59,9 +59,19 @@ class _TriageScreenState extends State<TriageScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Obx(() {
-          final index = _triageController.currentQuestionIndex.value;
-          final question = _triageController.currentQuestion;
+        child: Stack(
+          children: [
+            Obx(() {
+              if (_triageController.isTriageComplete.value) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Get.toNamed(Routes.dispatch);
+                });
+              }
+              return const SizedBox.shrink();
+            }),
+            Obx(() {
+              final index = _triageController.currentQuestionIndex.value;
+              final question = _triageController.currentQuestion;
 
           return AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
@@ -195,7 +205,9 @@ class _TriageScreenState extends State<TriageScreen> {
             ),
           );
         }),
-      ),
-    );
+      ],
+    ),
+  ),
+);
   }
 }

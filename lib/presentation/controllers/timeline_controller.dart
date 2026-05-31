@@ -15,6 +15,7 @@ class TimelineController extends GetxController {
   final RxBool isUpdating = false.obs;
 
   Timer? _elapsedTimer;
+  DateTime? _timerStartTime;
 
   void syncFromIncident(IncidentModel incident) {
     isUpdating.value = true;
@@ -23,21 +24,22 @@ class TimelineController extends GetxController {
   }
 
   void startElapsedTimer(DateTime incidentStartTime) {
-    _elapsedTimer?.cancel();
+    _elapsedTimer?.cancel(); // cancel any existing timer
+    _timerStartTime = DateTime.now();
     
     // Immediate first update
-    _updateElapsedDisplay(incidentStartTime);
+    _updateElapsedDisplay();
     
     // Periodic update
-    _elapsedTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      _updateElapsedDisplay(incidentStartTime);
+    _elapsedTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _updateElapsedDisplay();
     });
   }
 
-  void _updateElapsedDisplay(DateTime incidentStartTime) {
-    final now = DateTime.now();
-    final duration = now.difference(incidentStartTime.toLocal());
-    elapsedTimeDisplay.value = formatElapsed(duration);
+  void _updateElapsedDisplay() {
+    final startTime = _timerStartTime ?? DateTime.now();
+    final elapsed = DateTime.now().difference(startTime);
+    elapsedTimeDisplay.value = formatElapsed(elapsed);
   }
 
   String formatElapsed(Duration duration) {

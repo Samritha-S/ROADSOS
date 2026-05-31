@@ -36,7 +36,8 @@ class IncidentRepository {
       final sorted = _webIncidents.values.toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       for (final incident in sorted) {
-        if (incident.currentState != IncidentState.RESOLVED) {
+        if (incident.currentState != IncidentState.RESOLVED &&
+            DateTime.now().difference(incident.createdAt).inHours < 24) {
           return incident;
         }
       }
@@ -48,7 +49,7 @@ class IncidentRepository {
       
       final result = await db.query(
         'incidents',
-        where: 'current_state != ?',
+        where: 'current_state != ? AND created_at > datetime(\'now\', \'-24 hours\')',
         whereArgs: [IncidentState.RESOLVED.name],
         orderBy: 'created_at DESC',
         limit: 1,

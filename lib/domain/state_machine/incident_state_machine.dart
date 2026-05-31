@@ -250,6 +250,13 @@ class IncidentStateMachine {
     _controller.add(incident);
   }
 
+  void addTimelineEntry(TimelineEntryType type, String message) {
+    if (_currentIncident == null) return;
+    final incident = _addTimelineEntry(type, message);
+    _currentIncident = incident;
+    _controller.add(incident);
+  }
+
   void dispose() {
     _controller.close();
   }

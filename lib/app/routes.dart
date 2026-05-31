@@ -45,7 +45,7 @@ class Routes {
         ),
         GetPage(
           name: dispatch,
-          page: () => const DispatchScreen(),
+          page: () => DispatchScreen(),
         ),
         GetPage(
           name: coordination,

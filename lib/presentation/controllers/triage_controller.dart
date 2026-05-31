@@ -34,19 +34,18 @@ class TriageController extends GetxController {
 
   void _advanceOrComplete(int answeredIndex) {
     if (answeredIndex < 2) {
-      currentQuestionIndex.value++;
+      currentQuestionIndex.value = answeredIndex + 1;
     } else {
+      isTriageComplete.value = true;
       _completeTriage();
     }
   }
 
   Future<void> _completeTriage() async {
-    isTriageComplete.value = true;
-    
     await Get.find<IncidentController>().submitTriage(
-      q1Answer: answers[0] ?? false,
-      q2Answer: answers[1] ?? false,
-      q3Answer: answers[2] ?? false,
+      q1Answer: answers[0] == true,
+      q2Answer: answers[1] == true,
+      q3Answer: answers[2] == true,
       q1NotSure: notSureAnswers[0],
       q2NotSure: notSureAnswers[1],
       q3NotSure: notSureAnswers[2],

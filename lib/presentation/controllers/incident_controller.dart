@@ -17,6 +17,7 @@ import '../../data/remote/sync_service.dart';
 import '../../domain/state_machine/incident_state_machine.dart';
 import '../../domain/triage/triage_engine.dart';
 import 'service_controller.dart';
+import 'timeline_controller.dart';
 
 class IncidentController extends GetxController {
   final IncidentStateMachine stateMachine;
@@ -92,6 +93,10 @@ class IncidentController extends GetxController {
       stateMachine.startIncident(
         latitude: position?.latitude,
         longitude: position?.longitude,
+      );
+
+      Get.find<TimelineController>().startElapsedTimer(
+        DateTime.now(),
       );
 
       final incident = currentIncident.value;
@@ -175,7 +180,7 @@ class IncidentController extends GetxController {
     }
   }
 
-  Future<void> sendFamilyAlert() async {
+  Future<void> sendFamilyAlert({bool isVictim = true}) async {
     final incident = currentIncident.value;
     if (incident == null) return;
 
@@ -185,6 +190,7 @@ class IncidentController extends GetxController {
     //   longitude: incident.longitude,
     //   incidentTime: incident.createdAt,
     //   countryCode: incident.countryCode,
+    //   isVictim: isVictim,
     // );
 
     stateMachine.recordFamilyAlerted();

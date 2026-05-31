@@ -25,12 +25,12 @@ class _WaitingScreenState extends State<WaitingScreen> {
   @override
   void initState() {
     super.initState();
-
-    final currentIncident = _incidentController.currentIncident.value;
-    if (currentIncident != null) {
-      _timelineController.syncFromIncident(currentIncident);
-      _timelineController.startElapsedTimer(currentIncident.createdAt);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final incident = Get.find<IncidentController>().currentIncident.value;
+      if (incident != null) {
+        Get.find<TimelineController>().syncFromIncident(incident);
+      }
+    });
 
     _incidentWorker = ever(_incidentController.currentIncident, (incident) {
       if (incident != null) {
