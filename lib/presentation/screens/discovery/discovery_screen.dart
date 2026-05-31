@@ -63,44 +63,51 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
           final incidentId = incident?.id ?? '';
           final shortId = incidentId.length >= 8 ? incidentId.substring(0, 8) : '';
 
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          return Stack(
             children: [
-              const SizedBox(height: 40.0),
-              // GPS pulsing concentric rings
-              const SizedBox(
-                height: 150.0,
-                child: Center(
-                  child: PulseRingsWidget(),
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // GPS pulsing concentric rings
+                    const SizedBox(
+                      height: 150.0,
+                      child: Center(
+                        child: PulseRingsWidget(),
+                      ),
+                    ),
+                    const SizedBox(height: 32.0),
+                    // Orienting sentence
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                      child: Text(
+                        AppStrings.orientingSentence,
+                        style: AppTextStyles.headline,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 24.0),
+                    // Locating... text
+                    Text(
+                      AppStrings.locatingText,
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 32.0),
-              // Orienting sentence
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Text(
-                  AppStrings.orientingSentence,
-                  style: AppTextStyles.headline,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 24.0),
-              // Locating... text
-              Text(
-                AppStrings.locatingText,
-                style: AppTextStyles.bodyLarge.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const Spacer(),
-              // Incident ID display
+              // Incident ID display pinned to bottom
               if (shortId.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 24.0),
-                  child: Text(
-                    '${AppStrings.incidentPrefix}$shortId',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textSecondary,
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: Text(
+                      '${AppStrings.incidentPrefix}$shortId',
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ),
                 ),

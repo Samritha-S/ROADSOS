@@ -1,0 +1,22 @@
+{
+  "@@locale": "gu",
+  "appTitle": "ROADSoS",
+  "hello": "નમસ્તે",
+  "discoverPrompt": "SOS દબાવીને આપાતકાલીન સહાય પ્રારંભ કરો.",
+  "triageQuestion1": "શું કોઈ ઈજા થયેલ છે?",
+  "triageQuestion2": "શું ગંભીર લક્ષણો (બેહુદી, રક્તસ્ત્રાવ, શ્વાસમાં મુશ્કેલી) છે?",
+  "triageQuestion3": "શું તાત્કાલિક જોખમ (આગ, ઇંધણનું લીક, ચાલુ વાહન) છે?",
+  "yes": "હાં",
+  "no": "ના",
+  "notSure": "ખાતરી નથી",
+  "dispatchTitle": "આપાતકાલીન સેવાઓ",
+  "callNow": "હમણાં કૉલ કરો",
+  "sendSms": "SMS મોકલો",
+  "alertFamily": "કુટુંબને સૂચિત કરો",
+  "waitingTitle": "મદદ માર્ગમાં છે",
+  "stayCalm": "શાંત રહો. આપાતકાલીન સેવાઓ સંપર્ક કરવામાં આવી છે.",
+  "resolutionTitle": "ઘટનાઓની રિપોર્ટ",
+  "saveReport": "રિપોર્ટ સાચવો",
+  "shareReport": "રિપોર્ટ શેર કરો",
+  "thankYou": "ROADSoS ઉપયોગ કરવા બદલ આભાર"
+}

@@ -1,0 +1,15 @@
+{
+  "@@locale": "te",
+  "appTitle": "ROADSoS",
+  "hello": "నమస్కారం",
+  "discoverPrompt": "అత్యవసర సహాయాన్ని ప్రారంభించడానికి SOS ట్యాప్ చేయండి.",
+  "triageQuestion1": "ఎవరో గాయపడినా?",
+  "triageQuestion2": "తీవ్ర లక్షణాలు?",
+  "triageQuestion3": "తక్షణ ప్రమాదం ఉన్నదా?",
+  "dispatchTitle": "డిస్పాచ్ సేవలు",
+  "waitingTitle": "ప్రతిస్పందకులు కోసం వేచి ఉండటం",
+  "resolutionTitle": "సంఘటన నివేదిక",
+  "saveReport": "సంఘటన నివేదికను సేవ్ చేయండి",
+  "shareReport": "నివేదికను పంచుకోండి",
+  "thankYou": "ROADSoS ఉపయోగించినందుకు ధన్యవాదాలు!"
+}

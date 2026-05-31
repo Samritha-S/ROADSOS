@@ -1,0 +1,15 @@
+{
+  "@@locale": "ta",
+  "appTitle": "ROADSoS",
+  "hello": "வணக்கம்",
+  "discoverPrompt": "அவசர உதவியைத் தொடங்க SOS ஐத் தட்டவும்.",
+  "triageQuestion1": "யாராவது காயமடைந்தவர்களா?",
+  "triageQuestion2": "மிகக் கடுமையான அறிகுறிகள்?",
+  "triageQuestion3": "உடனடி கட்டுப்பாடு உள்ளதா?",
+  "dispatchTitle": "அழைப்பு சேவை",
+  "waitingTitle": "பதிலளிப்பவர்களின் காத்திருப்பு",
+  "resolutionTitle": "நிகழ்வு அறிக்கை",
+  "saveReport": "நிகழ்வு அறிக்கையை சேமிக்கவும்",
+  "shareReport": "அறிக்கையை பகிரவும்",
+  "thankYou": "ROADSoS பயன்படுத்தியதற்கு நன்றி!"
+}

@@ -79,39 +79,55 @@ class DispatchScreen extends StatelessWidget {
           AppStrings.didSomeoneAnswer,
           style: AppTextStyles.subheadline,
         ),
-        actions: [
-          // NO Button
-          SizedBox(
-            height: 80.0, // Minimum touch target height: 80px
-            child: TextButton(
-              onPressed: () {
-                Get.back();
-                _showNoAnswerFollowUpDialog(facility);
-              },
-              child: Text(
-                AppStrings.answerNo,
-                style: AppTextStyles.buttonLabel.copyWith(color: AppColors.criticalRed),
+        content: Row(
+          children: [
+            // NO Button
+            Expanded(
+              child: SizedBox(
+                height: 56.0,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.criticalRed, width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    Get.back();
+                    _showNoAnswerFollowUpDialog(facility);
+                  },
+                  child: Text(
+                    AppStrings.answerNo,
+                    style: AppTextStyles.buttonLabel.copyWith(color: AppColors.criticalRed),
+                  ),
+                ),
               ),
             ),
-          ),
-          // YES Button
-          SizedBox(
-            height: 80.0, // Minimum touch target height: 80px
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.confirmedGreen,
-              ),
-              onPressed: () {
-                incidentController.recordServiceContacted(facility.id, facility.name);
-                Get.back();
-              },
-              child: Text(
-                AppStrings.answerYes,
-                style: AppTextStyles.buttonLabel,
+            const SizedBox(width: 16.0),
+            // YES Button
+            Expanded(
+              child: SizedBox(
+                height: 56.0,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.confirmedGreen,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onPressed: () {
+                    incidentController.recordServiceContacted(facility.id, facility.name);
+                    Get.back();
+                  },
+                  child: Text(
+                    AppStrings.answerYes,
+                    style: AppTextStyles.buttonLabel,
+                  ),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       barrierDismissible: false,
     );

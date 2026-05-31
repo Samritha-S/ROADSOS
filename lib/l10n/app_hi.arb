@@ -1,0 +1,15 @@
+{
+  "@@locale": "hi",
+  "appTitle": "ROADSoS",
+  "hello": "नमस्ते",
+  "discoverPrompt": "आपातकालीन सहायता शुरू करने के लिए SOS टैप करें।",
+  "triageQuestion1": "क्या कोई घायल है?",
+  "triageQuestion2": "गंभीर लक्षण?",
+  "triageQuestion3": "तत्काळ खतरा मौजूद है?",
+  "dispatchTitle": "डिस्पैच सेवाएँ",
+  "waitingTitle": "प्रतिक्रियाकर्ताओं की प्रतीक्षा",
+  "resolutionTitle": "घटना रिपोर्ट",
+  "saveReport": "घटना रिपोर्ट सहेजें",
+  "shareReport": "रिपोर्ट साझा करें",
+  "thankYou": "ROADSoS का उपयोग करने के लिए धन्यवाद!"
+}

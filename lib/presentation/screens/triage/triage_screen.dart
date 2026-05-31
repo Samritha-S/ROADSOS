@@ -132,71 +132,74 @@ class _TriageScreenState extends State<TriageScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // YES button
-                        SizedBox(
-                          height: 80.0, // Minimum touch target height: 80px
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.confirmedGreen,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.0),
+                        Row(
+                          children: [
+                            // NO button (left)
+                            Expanded(
+                              child: SizedBox(
+                                height: 80.0, // Minimum touch target height: 80px
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor: AppColors.surface,
+                                    side: const BorderSide(
+                                      color: AppColors.textSecondary,
+                                      width: 1.0,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                  ),
+                                  onPressed: () => _triageController.answerNo(index),
+                                  child: Text(
+                                    AppStrings.answerNo,
+                                    style: AppTextStyles.buttonLabel,
+                                  ),
+                                ),
                               ),
                             ),
-                            onPressed: () => _triageController.answerYes(index),
-                            child: Text(
-                              AppStrings.answerYes,
-                              style: AppTextStyles.buttonLabel,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16.0),
-
-                        // NO button
-                        SizedBox(
-                          height: 80.0, // Minimum touch target height: 80px
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: AppColors.surface,
-                              side: const BorderSide(
-                                color: AppColors.textSecondary,
-                                width: 1.0,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.0),
+                            const SizedBox(width: 16.0),
+                            // YES button (right)
+                            Expanded(
+                              child: SizedBox(
+                                height: 80.0, // Minimum touch target height: 80px
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.confirmedGreen,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                  ),
+                                  onPressed: () => _triageController.answerYes(index),
+                                  child: Text(
+                                    AppStrings.answerYes,
+                                    style: AppTextStyles.buttonLabel,
+                                  ),
+                                ),
                               ),
                             ),
-                            onPressed: () => _triageController.answerNo(index),
-                            child: Text(
-                              AppStrings.answerNo,
-                              style: AppTextStyles.buttonLabel,
-                            ),
-                          ),
+                          ],
                         ),
                         const SizedBox(height: 16.0),
 
                         // NOT SURE button
                         SizedBox(
-                          height: 80.0, // Touch target height: 80px
+                          height: 80.0,
                           width: double.infinity,
-                          child: Center(
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                minimumSize: const Size(double.infinity, 56.0), // Visual smaller height
-                                backgroundColor: Colors.transparent,
-                              ),
-                              onPressed: () => _triageController.answerNotSure(index),
-                              child: Text(
-                                AppStrings.answerNotSure,
-                                style: AppTextStyles.bodyLarge.copyWith( // Minimum 18sp
-                                  color: AppColors.textSecondary,
-                                  decoration: TextDecoration.underline,
-                                ),
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 56.0),
+                            ),
+                            onPressed: () => _triageController.answerNotSure(index),
+                            child: Text(
+                              AppStrings.answerNotSure,
+                              style: AppTextStyles.buttonLabel.copyWith(
+                                color: AppColors.textSecondary,
+                                decoration: TextDecoration.underline,
                               ),
                             ),
                           ),
                         ),
+
                       ],
                     ),
                   ),

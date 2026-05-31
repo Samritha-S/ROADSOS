@@ -1,0 +1,15 @@
+{
+  "@@locale": "ml",
+  "appTitle": "ROADSoS",
+  "hello": "ഹലോ",
+  "discoverPrompt": "ഇമർജൻസി സഹായം ആരംഭിക്കാൻ SOS ടാപ്പ് ചെയ്യുക.",
+  "triageQuestion1": "എവിടെയെങ്കിലും പരിക്ക് ഉണ്ടോ?",
+  "triageQuestion2": "ഗുരുതരമായ ലക്ഷണങ്ങൾ?",
+  "triageQuestion3": "വേനൽക്കാലം (പിടി) അവഗണിക്കാനാവുന്ന അപകടം ഉണ്ടോ?",
+  "dispatchTitle": "ഡിസ്പാച്ച് സേവനങ്ങള്",
+  "waitingTitle": "പ്രതികരണത്തിനായി കാത്തിരിക്കുന്നു",
+  "resolutionTitle": "സംഭവ റിപ്പോർട്ട്",
+  "saveReport": "സംഭവ റിപ്പോർട്ട് സംരക്ഷിക്കുക",
+  "shareReport": "റിപ്പോർട്ട് പങ്കിടുക",
+  "thankYou": "ROADSoS ഉപയോഗിച്ചതിന് നന്ദി!"
+}
